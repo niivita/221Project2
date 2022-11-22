@@ -19,13 +19,17 @@
           <form>
           <div class="form-group" v-if= "isAddTask">
           <label for = "title" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Title</span></label>
-          <input type="text" class="form-control mt-3" id="title" v-model = "title" placeholder = "Title"> </input>
+          <input type="text" class="form-control mt-3" id="title" v-model = "title" placeholder = "Title" v-model= "v$.title.$model"> </input>
+          <div class="input-errors" v-for="(error, index) of v$.description.$errors" :key="index">
+              <div style="color:red; font-size:12px" class="error-msg">{{ error.$message }}</div>
           </div>
           
           <div class = "form-group" >
           <label for = "description" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Description</span></label>
-          <input type="text" class="form-control mt-3" id="description" placeholder = "Description"  v-model= "v$.description.$model"></input>
-
+          <input type="text" class="form-control mt-3" id="description" placeholder = "Description" v-model= "v$.description.$model"> </input>
+          <div class="input-errors" v-for="(error, index) of v$.description.$errors" :key="index">
+              <div style="color:red; font-size:12px" class="error-msg">{{ error.$message }}</div>
+            </div>
           </div>
           <div class = "form-group" >
           <label for = "deadline" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Deadline</span></label>
@@ -162,16 +166,20 @@ export default {
   },
   methods: {
     submitTask(title, description, deadline, priority){
-        const[year, month, day] = this.deadline.split('-');
+        this.v$.$validate(); 
+        if(!this.v$.$error){
+           const[year, month, day] = this.deadline.split('-');
         this.$emit('submitTask',this.title, this.description, `${month}/${day}/${year}`, this.priority);
         this.clear();
         this.close();
-      
+        }
     },
+    
     close() {
       this.clear();
       this.$emit('close');
     },
+    
     clear(){
       this.title = '';
       this.description = '';
@@ -179,7 +187,7 @@ export default {
       this.priority = 'low';
       
     },
-    
+
     editTask(){
       const[year, month, day] = this.deadline.split('-');
       this.$emit('editTask',this.title, this.description, `${month}/${day}/${year}`, this.priority);      
@@ -187,21 +195,38 @@ export default {
       this.close();
     },
 
-    setup(){
-      return {v$: useVuelidate()}
-    }
+    
 
-    validations
-   
+},
+
+setup () {
+    return { v$: useVuelidate() }
   },
-  data(){
-    return {
-      title: '',
-      description: '',
-      priority:'',
-      deadline: '',
-    }
+
+validations() {
+  return {
+      title: { 
+        required, title_validation: {
+          $message: 'Invalid'
+        }
+      },
+      description: { 
+        required, description_validation: {
+          $message: 'Invalid'
+        }
+      }
   }
+  },
+
+data(){
+  return {
+    title: '',
+    description: '',
+    priority:'',
+    deadline: '',
+  }
+}
+
 };
 </script>
 

@@ -32,7 +32,7 @@
           </div>
           <div class = "form-group">
             <div>Priority: {{priority}} </div>
-            <input type="radio" name="priority" id="low" value = "Low" v-model = "priority" />
+            <input type="radio" name="priority" id="low" value = "Low" v-model = "priority"/>
             <label for="low" class = "radio"> Low </label>
             <input type="radio" name="priority" id="med" value = "Med" v-model = "priority"/>
             <label class= "radio" for="med"> Med </label>

@@ -74,7 +74,7 @@
                   class="btn btn-primary btn-block btn-sm w-75"
                 >
                   <span class="fa-solid fa-pen-to-square"></span>
-                  update
+                  Update
                 </button>
               </div>
               <div>
@@ -83,7 +83,7 @@
                   class="btn btn-danger btn-block btn-sm w-75"
                 >
                   <span class="fa-solid fa-circle-xmark"></span>
-                  cancel
+                  Delete
                 </button>
               </div>
             </td>
@@ -148,12 +148,12 @@ export default {
       this.tasks[this.taskIndex].description = description;
       this.tasks[this.taskIndex].deadline = deadline;
       this.tasks[this.taskIndex].priority = priority;
-     this.$toast.success('The task was edited successfully!');
+      this.$toast.success('The task was edited successfully!');
     },
 
     deleteTask(index) {
       this.tasks.splice(index, 1);
-     this.$toast.success('The task was deleted successfully!');
+      this.$toast.success('The task was deleted successfully!');
     },
 
     showPopup() {

@@ -24,7 +24,8 @@
           
           <div class = "form-group" >
           <label for = "description" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Description</span></label>
-          <input type="text" class="form-control mt-3" id="description" placeholder = "Description" v-model= "description"></input>
+          <input type="text" class="form-control mt-3" id="description" placeholder = "Description"  v-model= "v$.description.$model"></input>
+
           </div>
           <div class = "form-group" >
           <label for = "deadline" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Deadline</span></label>
@@ -139,6 +140,9 @@
 </style>
 
 <script>
+import useVuelidate from '@vuelidate/core' 
+import {required} from '@vuelidate/validators'
+
 export default {
   name: 'Popup',
   props: {
@@ -182,10 +186,13 @@ export default {
       this.clear();
       this.close();
     },
-   
-    checkValidTitle(title){
-      return !this.tasks.filter(e => e.title === title).length > 0
+
+    setup(){
+      return {v$: useVuelidate()}
     }
+
+    validations
+   
   },
   data(){
     return {
@@ -193,10 +200,6 @@ export default {
       description: '',
       priority:'',
       deadline: '',
-      titleRules: [
-        v=> !!v || 'Title is required',
-        v => this.checkValidTitle(v) || 'Title cannot repeat',
-      ],
     }
   }
 };

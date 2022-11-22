@@ -13,12 +13,12 @@
   />
 
   <div class="container-fluid">
-    <div class="card">
+    <div class="card bg-primary text-center">
       <div
         class="card-header d-flex justify-content-between align-items-center"
       >
         <div class="col-sm-11">
-          <h5 class="text-center">FRAMEWORKS</h5>
+          <h5 class="card-title" style = "color: white"> <i class="fa-solid fa-bars"></i>   FRAMEWORKS</h5>
         </div>
         <div class="col-sm-1">
           <button
@@ -34,7 +34,7 @@
 
     <div>
       <!--Task Table-->
-      <table class="table table-bordered">
+      <table class="table table-bordered text-center">
         <thead>
           <tr>
             <th scope="col">Title</th>
@@ -116,6 +116,10 @@ export default {
       deadline: '',
       priority: 'low',
       tasks: [],
+      titleRules: [
+        v => !!v || 'Title is required',
+        v => this.checkValidTitle(v) || 'Title must be unique',
+      ],
     };
   },
   methods: {
@@ -162,6 +166,9 @@ export default {
     closePopup() {
       this.isModalVisible = false;
     },
+    checkValidTitle(title){
+        return !this.tasks.filter(e => e.title === title).length > 0
+      }
   },
 };
 </script>

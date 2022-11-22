@@ -141,19 +141,19 @@ export default {
         priority: priority,
         isComplete: false,
       });
-      //this.$toast.success('The task was added successfully!');
+      this.$toast.success('The task was added successfully!');
     },
 
     editTask(description, deadline, priority) {
       this.tasks[this.taskIndex].description = description;
       this.tasks[this.taskIndex].deadline = deadline;
       this.tasks[this.taskIndex].priority = priority;
-     // this.$toast.success('The task was edited successfully!');
+     this.$toast.success('The task was edited successfully!');
     },
 
     deleteTask(index) {
       this.tasks.splice(index, 1);
-     // this.$toast.success('The task was deleted successfully!');
+     this.$toast.success('The task was deleted successfully!');
     },
 
     showPopup() {

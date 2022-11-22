@@ -1,38 +1,42 @@
-
 <template>
   <div class="modal-backdrop">
-    <div class="modal" id="addModal" role="dialog">
+    <div class="modal" id="popup" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
-              <span class="fa-solid fa-circle-plus" ></span>
-               Add Task
+              <div v-if="isAddTask" key = "addA">
+                <span class="fa-solid fa-circle-plus" ></span>
+                Add Task
+              </div>
+              <div v-else key = "updateA">
+                <span class="fa-solid fa-pen-to-square" ></span>
+                Edit Task
+               </div>
             </h5>
           </div>
           <section class="modal-body">
           <form>
-          <div class="form-group">
-          <label for = "Title" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Title</span></label>
-          <input type="text" class="form-control" id="title"  placeholder = "Title"> </input>
+          <div class="form-group" v-if= "isAddTask">
+          <label for = "title" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Title</span></label>
+          <input type="text" class="form-control mt-3" id="title" v-model = "title" placeholder = "Title"> </input>
           </div>
           
-          <div class = "form-group">
-          <label for = "Description" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Description</span></label>
-          <input type="text" class="form-control mt-3" id="title" placeholder = "Description"></input>
+          <div class = "form-group" >
+          <label for = "description" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Description</span></label>
+          <input type="text" class="form-control mt-3" id="description" placeholder = "Description" v-model= "description"></input>
           </div>
-          <div class = "form-group">
-          <label for = "Deadline" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Deadline</span></label>
-          <input type = "date" class = "form-control mt-3" id ="deadline" v-modal = "deadline">
+          <div class = "form-group" >
+          <label for = "deadline" class="ms-2 position-absolute" style="margin-top: -0.60rem"> <span class="h7 small bg-white text-muted px-1">Deadline</span></label>
+          <input type = "date" class = "form-control mt-3" id ="deadline" v-model = "deadline">
           </div>
           <div class = "form-group">
             <div>Priority: {{priority}} </div>
-            <input type="radio" name="priority" id="low" value = "Low" v-modal = "priority" />
+            <input type="radio" name="priority" id="low" value = "Low" v-model = "priority" />
             <label for="low" class = "radio"> Low </label>
-            <input type="radio" name="priority" id="med" value = "Med" v-modal = "priority"/>
+            <input type="radio" name="priority" id="med" value = "Med" v-model = "priority"/>
             <label class= "radio" for="med"> Med </label>
-
-            <input type="radio" id="high" value = "High" v-modal = "priority" name="priority"/> 
+            <input type="radio" id="high" value = "High" v-model = "priority" name="priority"/> 
 
             <label for="high" class= "radio"> High </label>
             </div>
@@ -40,14 +44,22 @@
 
           </section>
 
-          <footer class="modal-footer">
-          <div>
-            <button type="button" class="btn btn-primary" @click="submitTask">
+        <footer class="modal-footer">
+            <div v-if = "isAddTask" key = "addB">
+              <button type="button" class="btn btn-block btn-primary" @click="submitTask">
               <span class="fa-solid fa-circle-plus"></span> Add
-            </button>
-            <button type="button" class="btn btn-danger" @click="close">
+              </button>
+              <button type="button" class="btn btn-block btn-danger" @click="close">
               <span class="fa-solid fa-circle-xmark"></span> Cancel
-            </button>
+              </button>
+            </div>
+            <div v-else key = "updateB">
+              <button type="button" class="btn btn-block btn-primary" @click="editTask">
+              <span class="fa-solid fa-pen-to-square"></span> Edit
+              </button>
+              <button type="button" class="btn btn-block btn-danger" @click="close">
+              <span class="fa-solid fa-circle-xmark"></span> Cancel
+              </button>
             </div>
           </footer>
         </div>
@@ -128,64 +140,62 @@
 
 <script>
 export default {
-  name: 'Modal',
+  name: 'Popup',
   props: {
     isModalVisible: Boolean,
-    existing_description: String, 
-    existing_deadline: String, 
-    existing_priority: String, 
+    isAddTask: Boolean,
+    existing_description: String,
+    existing_deadline: String,
+    existing_priority: String,
     tasks: Array
-  }, 
-  watch:{
+  },
+  watch: {
     deadline(){
       if(this.deadline.includes("-")){
         this.deadline = this.formatDate(this.deadline)
       }
-    }
-  }, 
+    },
+  },
   methods: {
-    submitTask(){
-      if(this.$refs.form.validate()){
-        this.$emit('submitTask', this.title, this.description, this.deadline, this.priority);
-        this.clear(); 
+    submitTask(title, description, deadline, priority){
+        const[year, month, day] = this.deadline.split('-');
+        this.$emit('submitTask',this.title, this.description, `${month}/${day}/${year}`, this.priority);
+        this.clear();
         this.close();
-      }
-    }, 
+      
+    },
     close() {
+      this.clear();
       this.$emit('close');
     },
     clear(){
       this.title = '';
       this.description = '';
-      this.deadline = ''; 
-      this.priority = 'low'; 
-      this.$refs.form.resetValidation();
-    }
-  },
-    /*getParentData(){
-      this.description=this.existing_description;
-      this.deadline=this.existing_deadline;
-      this.priority=this.existing_priority;
-      },
-    formatDate(date){
-      if (!date) return null;
-      const [year, month, day] = date.split('-');
-      return `${month}/${day}/${year}`;
+      this.deadline = '';
+      this.priority = 'low';
+      
     },
+    
+    editTask(){
+      const[year, month, day] = this.deadline.split('-');
+      this.$emit('editTask',this.title, this.description, `${month}/${day}/${year}`, this.priority);      
+      this.clear();
+      this.close();
+    },
+   
     checkValidTitle(title){
       return !this.tasks.filter(e => e.title === title).length > 0
-    },*/
-
+    }
+  },
   data(){
     return {
       title: '',
       description: '',
-      priority: 'low',
-      deadline: '', 
-      date: '', 
+      priority:'',
+      deadline: '',
       titleRules: [
-        v => !!v || "Title is required",
-        v => this.checkValidTitle(v) || 'Title must be unique', 
+        v=> !!v || 'Title is required',
+        v => this.checkValidTitle(v) || 'Title cannot repeat',
       ],
     }
   }

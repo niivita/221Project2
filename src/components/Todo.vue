@@ -1,168 +1,170 @@
 <template>
-<Popup v-show="isAddModalVisible" @close="closeAddModal" 
-:existing_description = description
-:existing_deadline = deadline
-:existing_priority = priority
-:tasks = "tasks"
-@submitTask = "submitTask"
-@close = "closeAddModal"/>
+  <popup
+    v-show="isModalVisible"
+    :isModalVisible="isModalVisible"
+    :isAddTask="isAddTask"
+    :existing_description="description"
+    :existing_deadline="deadline"
+    :existing_priority="priority"
+    :tasks="tasks"
+    @submitTask="submitTask"
+    @editTask="editTask"
+    @close="closePopup"
+  />
 
-<editpopup v-show="isEditModalVisible" @close="closeEditModal"/>
-
-
-  <div class = "container-fluid">
-  <div class="card">
-            <div class = "panel panel-primary">
-
-  <div class = "d-flex justify-content-between align-items-center"> 
-   <div class = "col-sm-11">
-    <h5 class = "text-center"> FRAMEWORKS </h5>
-    </div>
-    <div class = "col-md-1"> 
-    <button type = "button" @click = "showAddModal" class = "btn btn-primary btn-sm"> <span class = "fa-solid fa-circle-plus"> </span> Add</button> 
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- Input -->
-    <div class = "d-flex"> 
-    <input v-model = "task" type = "text" placeholder = "Enter Task" class = "form-control">
-    <button @click = "submitTask" class = "btn btn-warning rounded-0"> SUBMIT </button>
+  <div class="container-fluid">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <div class="col-sm-11">
+          <h5 class="text-center">FRAMEWORKS</h5>
+        </div>
+        <div class="col-sm-1">
+          <button
+            @click="submitTaskPopup"
+            type="button"
+            class="btn btn-primary btn-sm"
+          >
+            <span class="fa-solid fa-circle-plus"></span> Add
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Task table -->
-    <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col" class = "text-center">Title</th>
-      <th scope="col" class = "text-center">Description</th>
-      <th scope="col" class = "text-center">Deadline</th>
-      <th scope="col" class = "text-center">Priority</th>
-      <th scope="col" class = "text-center">Is Complete</th>
-      <th scope="col" class = "text-center">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for = "(task, index) in tasks" :key ="index">
-    <td> {{task.title}} </td>
-    <td> {{task.description}} </td>
-    <td> {{task.deadline}} </td>
-    <td><span> {{task.priority}} </span> </td>
-    <td align = "center"> 
-      <label class="container">
-      <input type="checkbox" checked="checked">
-      <span class="checkmark"></span>
-    </label>
-</td>
-    <td>
-    <div class = "text-center">
-    <button class = "btn btn-primary btn-sm w-75" @click = "showEditModal" > 
-    <span class = "fa fa-pen"></span> Update </button>
+    <div>
+      <!--Task Table-->
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Deadline</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Is Complete</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(task, index) in tasks" :key="index">
+            <td>
+              <span>{{ task.title }}</span>
+            </td>
+            <td>
+              <span>{{ task.description }}</span>
+            </td>
+            <td>{{ task.deadline }}</td>
+            <td>
+              <span>{{ task.priority }}</span>
+            </td>
+            <td align="center">
+              <label class="container">
+                <input
+                  type="checkbox"
+                  v-model="tasks[index].isComplete"
+                  @click="tasks[index].isComplete = !tasks[index].isComplete" />
+                <span class="checkmark"></span
+              ></label>
+            </td>
+            <td>
+              <div>
+                <button
+                  v-if="!tasks[index].isComplete"
+                  @click="editTaskPopup(index)"
+                  class="btn btn-primary btn-block btn-sm w-75"
+                >
+                  <span class="fa-solid fa-pen-to-square"></span>
+                  update
+                </button>
+              </div>
+              <div>
+                <button
+                  @click="deleteTask(index)"
+                  class="btn btn-danger btn-block btn-sm w-75"
+                >
+                  <span class="fa-solid fa-circle-xmark"></span>
+                  cancel
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class = "text-center" @click = "deleteTask(index)">
-    <button class = "btn btn-danger btn-sm w-75"> 
-    <span class = "fa fa-circle-xmark"></span> Delete </button>
-    </div>
-    </div>
-     </td>
-
-    </tr>
-  </tbody>
-</table>
   </div>
 </template>
 
 <script>
-import Popup from './popup';
-import editpopup from './editpopup'; 
+import popup from './popup';
 export default {
   name: 'Todo',
   props: {
     msg: String,
   },
-
   components: {
-    Popup,
-    editpopup
+    popup,
   },
-
-  data(){
-    return{
-      isAddModalVisible: false, 
-      isEditModalVisible: false,
-      task: '', 
-      editedTask: null, 
-      availablePriorities: ['low', 'med', 'high'], 
-      tasks: [
-      {
-        taskIndex: null, 
-        title: '' , 
-        description: '',
-        deadline: '',
-        priority: "low",
-      }
-      ]
-    }
+  data() {
+    return {
+      isModalVisible: false,
+      isAddTask: true,
+      task: '',
+      availablePriorities: ['Low', 'Med', 'High'],
+      taskIndex: null,
+      title: '',
+      description: '',
+      deadline: '',
+      priority: 'low',
+      tasks: [],
+    };
+  },
+  methods: {
+    submitTaskPopup() {
+      this.isAddTask = true;
+      this.showPopup();
     },
 
-    methods: {
-      submitTask(){
-        if(this.task.length === 0) return;
-        
-        if(this.editedTask === null){
-        this.tasks.push({
-          title: title,
-          description: description, 
-          deadline: deadline,
-          priority: priority,
-          isComplete: false,
-        });
-        }
-        else{
-          this.tasks[this.editedTask].title = this.task;
-          this.editedTask = null; 
-        }
-        this.task = ''; 
-
-      },
-
-      deleteTask(index){
-        this.tasks.splice(index, 1); 
-      },
-
-      editTask(index){
-        this.task = this.tasks[index].title; 
-        this.editedTask = index; 
-      },
-      showAddModal() {
-        this.isAddModalVisible = true;
+    editTaskPopup(index) {
+      this.taskIndex = index;
+      this.isAddTask = false;
+      this.description = this.tasks[this.taskIndex].description;
+      this.deadline = this.tasks[this.taskIndex].deadline;
+      this.priority = this.tasks[this.taskIndex].priority;
+      this.showPopup();
     },
-       closeAddModal() {
-        this.isAddModalVisible = false;
-      },
 
-       showEditModal() {
-        this.isEditModalVisible = true;
+    submitTask(title, description, deadline, priority) {
+      this.tasks.push({
+        title: title,
+        description: description,
+        deadline: deadline,
+        priority: priority,
+        isComplete: false,
+      });
+      //this.$toast.success('The task was added successfully!');
     },
-       closeEditModal() {
-        this.isEditModalVisible = false;
-      },
-    }
+
+    editTask(description, deadline, priority) {
+      this.tasks[this.taskIndex].description = description;
+      this.tasks[this.taskIndex].deadline = deadline;
+      this.tasks[this.taskIndex].priority = priority;
+     // this.$toast.success('The task was edited successfully!');
+    },
+
+    deleteTask(index) {
+      this.tasks.splice(index, 1);
+     // this.$toast.success('The task was deleted successfully!');
+    },
+
+    showPopup() {
+      this.isModalVisible = true;
+    },
+    closePopup() {
+      this.isModalVisible = false;
+    },
+  },
 };
 </script>
 
-<style>
-.todo-header{
-  position: relative;
-  border-bottom: 1px solid #eeeeee;
-  background: blue;
-  color: white;
-  justify-content: center;
-}
-</style> 
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>
+<style scoped></style>
